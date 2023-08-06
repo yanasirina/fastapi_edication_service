@@ -29,4 +29,10 @@ async def _create_new_user(body: UserCreate, db) -> ShowUser:
 
 @user_router.post("/", response_model=ShowUser)
 async def create_user(body: UserCreate, db: AsyncSession = Depends(get_db)) -> ShowUser:
+    """
+    Так как в Depends была передана функция-генератор get_db, то сначала будет вызвана эта функция, затем получена
+    сессия из yields и передана в качестве параметра db в функцию create_new_user.
+    И уже после выполнения _create_new_user генератор get_db завершит свою работу и выполнит код после yields.
+    В нашем случае закроет сессию.
+    """
     return await _create_new_user(body, db)
