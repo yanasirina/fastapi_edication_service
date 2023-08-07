@@ -37,7 +37,7 @@ target_metadata = None
 ```
 ПОСЛЕ:
 ```
-from main import Base
+from db.models import Base
 target_metadata = Base.metadata
 # target_metadata = None
 ```
