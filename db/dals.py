@@ -1,5 +1,5 @@
 from sqlalchemy.ext.asyncio import AsyncSession
-from typing import Union
+from typing import Union    # Union - аналог ИЛИ
 from uuid import UUID
 
 from sqlalchemy import update, and_, select
