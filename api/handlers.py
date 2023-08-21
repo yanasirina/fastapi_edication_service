@@ -3,6 +3,7 @@ from uuid import UUID
 
 from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy.ext.asyncio import AsyncSession
+from sqlalchemy.exc import IntegrityError
 
 from api.models import UserCreate, ShowUser, DeleteUserResponse, UpdateUserRequest, UpdatedUserResponse
 from db.dals import UserDAL
@@ -77,7 +78,10 @@ async def create_user(body: UserCreate, db: AsyncSession = Depends(get_db)) -> S
     И уже после выполнения _create_new_user генератор get_db завершит свою работу и выполнит код после yields.
     В нашем случае закроет сессию.
     """
-    return await _create_new_user(body, db)
+    try:
+        return await _create_new_user(body, db)
+    except IntegrityError as err:
+        raise HTTPException(status_code=503, detail=f"Database error: {err}")
 
 
 @user_router.delete("/", response_model=DeleteUserResponse)
@@ -103,8 +107,13 @@ async def update_user_by_id(
     updated_user_params = body.dict(exclude_none=True)
     if updated_user_params == {}:
         raise HTTPException(status_code=422, detail="At least one parameter for user update info should be provided")
+
     user = await _get_user_by_id(user_id, db)
     if user is None:
         raise HTTPException(status_code=404, detail=f"User with id {user_id} not found.")
-    updated_user_id = await _update_user(updated_user_params=updated_user_params, db=db, user_id=user_id)
+
+    try:
+        updated_user_id = await _update_user(updated_user_params=updated_user_params, db=db, user_id=user_id)
+    except IntegrityError as err:
+        raise HTTPException(status_code=503, detail=f"Database error: {err}")
     return UpdatedUserResponse(updated_user_id=updated_user_id)
