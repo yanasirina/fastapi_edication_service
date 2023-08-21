@@ -1,5 +1,6 @@
 from typing import Union
 from uuid import UUID
+import logging
 
 from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy.ext.asyncio import AsyncSession
@@ -10,6 +11,7 @@ from db.dals import UserDAL
 from db.session import get_db
 
 user_router = APIRouter()
+logger = logging.getLogger(__name__)
 
 """Аналог views и url в django"""
 
@@ -81,6 +83,7 @@ async def create_user(body: UserCreate, db: AsyncSession = Depends(get_db)) -> S
     try:
         return await _create_new_user(body, db)
     except IntegrityError as err:
+        logger.error(err)
         raise HTTPException(status_code=503, detail=f"Database error: {err}")
 
 
@@ -115,5 +118,6 @@ async def update_user_by_id(
     try:
         updated_user_id = await _update_user(updated_user_params=updated_user_params, db=db, user_id=user_id)
     except IntegrityError as err:
+        logger.error(err)
         raise HTTPException(status_code=503, detail=f"Database error: {err}")
     return UpdatedUserResponse(updated_user_id=updated_user_id)
