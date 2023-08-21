@@ -53,6 +53,7 @@ async def _get_test_db():
 
         # create session for the interaction with database
         test_async_session = sessionmaker(test_engine, expire_on_commit=False, class_=AsyncSession)
+
         yield test_async_session()
     finally:
         pass
