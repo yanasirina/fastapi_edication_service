@@ -29,7 +29,7 @@ async def test_create_user_duplicate_email_error(client, create_user_in_database
         "name": "Nikolai",
         "surname": "Sviridov",
         "email": "lol@kek.com",
-        "is_active": True
+        "is_active": True,
     }
     await create_user_in_database(**user_data)
 
@@ -100,4 +100,3 @@ async def test_create_user_validation_error(
     data_from_resp = resp.json()
     assert resp.status_code == expected_status_code
     assert data_from_resp == expected_detail
-
