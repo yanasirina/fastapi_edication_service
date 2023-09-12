@@ -54,3 +54,8 @@ pre-commit install
 ```
 pre-commit run --all-files
 ```
+Для отмены прекоммитов:
+```
+pre-commit uninstall
+
+```
