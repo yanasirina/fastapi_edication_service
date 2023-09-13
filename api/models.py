@@ -83,3 +83,8 @@ class UpdateUserRequest(BaseModel):
                 status_code=422, detail="Surname should contains only letters"
             )
         return value
+
+
+class Token(BaseModel):
+    access_token: str
+    token_type: str
