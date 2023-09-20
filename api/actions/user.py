@@ -1,8 +1,8 @@
 from typing import Union
 from uuid import UUID
 
-from api.models import ShowUser
-from api.models import UserCreate
+from api.schemas import ShowUser
+from api.schemas import UserCreate
 from db.dals import UserDAL
 from hashing import Hasher
 

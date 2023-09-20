@@ -9,11 +9,11 @@ from sqlalchemy.ext.asyncio import AsyncSession
 
 import api.actions.user as views
 from api.actions.auth import get_current_user_from_token
-from api.models import DeleteUserResponse
-from api.models import ShowUser
-from api.models import UpdatedUserResponse
-from api.models import UpdateUserRequest
-from api.models import UserCreate
+from api.schemas import DeleteUserResponse
+from api.schemas import ShowUser
+from api.schemas import UpdatedUserResponse
+from api.schemas import UpdateUserRequest
+from api.schemas import UserCreate
 from db.models import User
 from db.session import get_db
 
