@@ -3,7 +3,8 @@ from uuid import UUID
 
 from api.schemas import ShowUser
 from api.schemas import UserCreate
-from db.dals import UserDAL
+from db.dals import UserDAL, PortalRole
+from db.models import User
 from hashing import Hasher
 
 """Вьюхи для пользователей"""
@@ -17,6 +18,7 @@ async def create_new_user(body: UserCreate, session) -> ShowUser:
             surname=body.surname,
             email=body.email,
             hashed_password=Hasher.get_password_hash(body.password),
+            roles=[PortalRole.ROLE_PORTAL_USER],
         )
         return ShowUser(
             user_id=user.user_id,
@@ -47,17 +49,11 @@ async def update_user(
         return updated_user_id
 
 
-async def get_user_by_id(user_id, session) -> Union[ShowUser, None]:
+async def get_user_by_id(user_id, session) -> Union[User, None]:
     async with session.begin():
         user_dal = UserDAL(session)
         user = await user_dal.get_user_by_id(
             user_id=user_id,
         )
         if user is not None:
-            return ShowUser(
-                user_id=user.user_id,
-                name=user.name,
-                surname=user.surname,
-                email=user.email,
-                is_active=user.is_active,
-            )
+            return user
