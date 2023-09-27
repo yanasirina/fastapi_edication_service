@@ -6,6 +6,8 @@ from api.schemas import UserCreate
 from db.dals import UserDAL
 from hashing import Hasher
 
+"""Вьюхи для пользователей"""
+
 
 async def create_new_user(body: UserCreate, session) -> ShowUser:
     async with session.begin():

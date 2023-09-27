@@ -14,6 +14,8 @@ from db.models import User
 from db.session import get_db
 from hashing import Hasher
 
+"""Вьюхи для аутентификации"""
+
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl="/login/token")
 
 
