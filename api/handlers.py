@@ -44,6 +44,18 @@ async def delete_user(
         db: AsyncSession = Depends(get_db),
         current_user: User = Depends(get_current_user_from_token)
 ) -> DeleteUserResponse:
+    user_for_deletion = await views.get_user_by_id(user_id, db)
+    if user_for_deletion is None:
+        raise HTTPException(
+            status_code=404, detail=f"User with id {user_id} not found."
+        )
+
+    if not views.check_user_permissions(
+        target_user=user_for_deletion,
+        current_user=current_user,
+    ):
+        raise HTTPException(status_code=403, detail="Forbidden.")
+
     deleted_user_id = await views.delete_user(user_id, db)
     if deleted_user_id is None:
         raise HTTPException(
@@ -80,11 +92,17 @@ async def update_user_by_id(
             detail="At least one parameter for user update info should be provided",
         )
 
-    user = await views.get_user_by_id(user_id, db)
-    if user is None:
+    user_for_update = await views.get_user_by_id(user_id, db)
+    if user_for_update is None:
         raise HTTPException(
             status_code=404, detail=f"User with id {user_id} not found."
         )
+
+    if user_id != current_user.user_id:
+        if views.check_user_permissions(
+            target_user=user_for_update, current_user=current_user
+        ):
+            raise HTTPException(status_code=403, detail="Forbidden.")
 
     try:
         updated_user_id = await views.update_user(
