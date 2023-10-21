@@ -12,18 +12,43 @@ services:
       - "5434:5432"
     networks:
       - custom
-  fastapi_education_service:
-    container_name: fastapi_education_service
-    image: fastapi_education_service
+    volumes:
+      - db-data:/var/lib/postgresql/data
+  alembic_migrations:
+    container_name: alembic_migrations
+    image: alembic_migrations # Specify the name of the Docker image to be built
+    command: ./run.sh
+    depends_on:
+      - db
     environment:
-      REAL_DATABASE_URL: "postgresql+asyncpg://postgres:postgres@db:5432/postgres"
+      ALEMBIC_DATABASE_URL: "postgresql://postgres:postgres@db/postgres"
+      REAL_DATABASE_URL: "postgresql+asyncpg://postgres:postgres@db:5434/postgres"
+      APP_PORT: "8001"
     build:
       context: .
       dockerfile: Dockerfile
     ports:
-      - "8003:8000"
+      - "8001:8001"
+    networks:
+      - custom
+  fastapi_education_service:
+    container_name: fastapi_education_service
+    image: fastapi_education_service
+    depends_on:
+      - db
+      - alembic_migrations
+    environment:
+      REAL_DATABASE_URL: "postgresql+asyncpg://postgres:postgres@db:5434/postgres"
+      APP_PORT: "8000"
+    build:
+      context: .
+      dockerfile: Dockerfile
+    ports:
+      - "8000:8000"
     networks:
       - custom
 networks:
   custom:
     driver: bridge
+volumes:
+  db-data:
